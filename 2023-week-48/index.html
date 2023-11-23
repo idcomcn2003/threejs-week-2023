@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>My first three.js app</title>
+    <style>
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./assets/js/threejs/three.module.js"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from './assets/js/threejs/addons/loaders/GLTFLoader.js';
+
+        // Our Javascript will go here.
+        // 创建场景
+        const scene = new THREE.Scene();
+        // 创建相机
+        const camera = new THREE.PerspectiveCamera();
+        camera.position.z = 10;
+        camera.position.y = 2;
+
+        // // 创建立方体
+        // const geometry = new THREE.BoxGeometry();
+        // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+
+        // // 网格
+        // const cube = new THREE.Mesh(geometry, material);
+        // cube.position.set(0, 3, 0);
+
+        // 创建GLTF加载器对象
+        const loader = new GLTFLoader();
+        //加载模型文件，返回gltf对象
+        loader.load('./assets/models/star_wars_tiehu_hunter.glb', function (gltf) {
+            console.log('控制台查看加载gltf文件返回的对象结构', gltf);
+            console.log('gltf对象场景属性', gltf.scene);
+            // 返回的场景对象gltf.scene插入到threejs场景中
+            scene.add(gltf.scene);
+        })
+
+        // 创建染器
+        const renderer = new THREE.WebGLRenderer();
+        //调整渲染器窗口大小
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        //添加网格地面
+        const gridHelper = new THREE.GridHelper(10, 10);
+        scene.add(gridHelper);
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // 进行渲染
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+
+</html>
