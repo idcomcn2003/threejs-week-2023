@@ -9,9 +9,11 @@
 
 ## 快捷键
 ~~~
-删除光标所在的一行:Ctrl+Shift+K
-按ctrl+A全选代码
-选中后按Shift+Alt+F让代码对齐
+删除光标所在的一行：Ctrl+Shift+K
+全选代码： ctrl+A
+选中后按让代码对齐：Shift+Alt+F
+单行注释: ctrl+/
+上下移动代码：ALT+↑/↓
 ~~~
 
 ## 下载安装 live server插件

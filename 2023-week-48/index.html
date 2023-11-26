@@ -22,52 +22,57 @@
     </script>
     <script type="module">
         import * as THREE from 'three';
-        import { GLTFLoader } from './assets/js/threejs/addons/loaders/GLTFLoader.js';
+        import { OrbitControls } from './assets/js/threejs/addons/controls/OrbitControls.js';
 
-        // Our Javascript will go here.
-        // 创建场景
-        const scene = new THREE.Scene();
-        // 创建相机
-        const camera = new THREE.PerspectiveCamera();
-        camera.position.z = 10;
-        camera.position.y = 2;
 
-        // // 创建立方体
-        // const geometry = new THREE.BoxGeometry();
-        // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+        let scene, cube, camera, renderer;
+        let axesHelper, controls;
 
-        // // 网格
-        // const cube = new THREE.Mesh(geometry, material);
-        // cube.position.set(0, 3, 0);
+        init();
+        render();
 
-        // 创建GLTF加载器对象
-        const loader = new GLTFLoader();
-        //加载模型文件，返回gltf对象
-        loader.load('./assets/models/star_wars_tiehu_hunter.glb', function (gltf) {
-            console.log('控制台查看加载gltf文件返回的对象结构', gltf);
-            console.log('gltf对象场景属性', gltf.scene);
-            // 返回的场景对象gltf.scene插入到threejs场景中
-            scene.add(gltf.scene);
-        })
+        function init() {
+            // 创建场景
+            scene = new THREE.Scene();
+            // 创建立方体
+            const geometry = new THREE.BoxGeometry(1, 1, 1);
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+            // 网格
+            cube = new THREE.Mesh(geometry, material);
+            scene.add(cube);
 
-        // 创建染器
-        const renderer = new THREE.WebGLRenderer();
-        //调整渲染器窗口大小
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+            //添加网格地面
+            const gridHelper = new THREE.GridHelper(10, 10);
+            scene.add(gridHelper);
 
-        //添加网格地面
-        const gridHelper = new THREE.GridHelper(10, 10);
-        scene.add(gridHelper);
+            /* 1.1 显示坐标轴 */
+            axesHelper = new THREE.AxesHelper(3);
+            scene.add(axesHelper);
+            // x:红色 ; y;绿色，z: 蓝色
 
-        function animate() {
-            requestAnimationFrame(animate);
+            // 创建相机
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+            camera.position.x = 2;
+            camera.position.y = 1;
 
-            // 进行渲染
-            renderer.render(scene, camera);
+            // 创建染器
+            renderer = new THREE.WebGLRenderer();
+            //调整渲染器窗口大小
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            /* 4 控制器*/
+            controls = new OrbitControls(camera, renderer.domElement);
         }
 
-        animate();
+
+        function render() {
+            renderer.render(scene, camera);
+            // cube.rotation.y += 0.01;
+            requestAnimationFrame(render);
+        }
+
     </script>
 </body>
 
