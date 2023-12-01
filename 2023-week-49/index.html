@@ -102,6 +102,14 @@
             requestAnimationFrame(render);
         }
 
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            // 设置视锥体的宽高比
+            camera.aspect = window.innerWidth / window.innerHeight;
+            // 使得视锥体的宽高比生效
+            camera.updateProjectionMatrix();
+        });
+
     </script>
 </body>
 
