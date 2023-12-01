@@ -23,17 +23,44 @@
     <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from './assets/js/threejs/addons/controls/OrbitControls.js';
-
+        import { GLTFLoader } from './assets/js/threejs/addons/loaders/GLTFLoader.js';
 
         let scene, cube, camera, renderer;
-        let axesHelper, controls;
+        let axesHelper, controls, loader;
 
         init();
         render();
 
+        function initCamera() {
+            // 创建透视摄像机
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+            camera.position.x = 5;
+            camera.position.y = 5;
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+        }
+
+        function createLight() {
+            // 创建平行光，颜色为白色，强度为 1
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            // 设置平行光的方向
+            directionalLight.position.set(0, 10, 0);
+            directionalLight.castShadow = true;
+            directionalLight.visible = true;
+            scene.add(directionalLight);
+            // 创建平行光辅助线
+            const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, .5);
+            directionalLightHelper.visible = true;
+            // 将辅助观察器添加到场景中
+            scene.add(directionalLightHelper);
+        }
+
         function init() {
             // 创建场景
             scene = new THREE.Scene();
+
+            createLight();
+
             // 创建立方体
             const geometry = new THREE.BoxGeometry(1, 1, 1);
             const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
@@ -41,20 +68,22 @@
             cube = new THREE.Mesh(geometry, material);
             scene.add(cube);
 
+            loader = new GLTFLoader()
+            loader.load('./assets/models/star_wars_tiehu_hunter.glb', result => {
+                scene.add(result.scene)
+            })
+
+
             //添加网格地面
-            const gridHelper = new THREE.GridHelper(10, 10);
+            const gridHelper = new THREE.GridHelper(20, 20);
             scene.add(gridHelper);
 
-            /* 1.1 显示坐标轴 */
-            axesHelper = new THREE.AxesHelper(3);
+            /* 1.1 显示坐标轴,参数坐标轴长度 */
+            axesHelper = new THREE.AxesHelper(13);
             scene.add(axesHelper);
             // x:红色 ; y;绿色，z: 蓝色
 
-            // 创建透视摄像机
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 5;
-            camera.position.x = 2;
-            camera.position.y = 1;
+            initCamera();
 
             // 创建染器
             renderer = new THREE.WebGLRenderer();
@@ -72,16 +101,6 @@
             // cube.rotation.y += 0.01;
             requestAnimationFrame(render);
         }
-
-        window.addEventListener('resize', () => {
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            // 设置视锥体的宽高比
-            camera.aspect = window.innerWidth / window.innerHeight;
-            // 使得视锥体的宽高比生效
-            camera.updateProjectionMatrix();
-        });
-
-
 
     </script>
 </body>
