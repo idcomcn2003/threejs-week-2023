@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>My first three.js app</title>
+    <style>
+        body {
+            margin: 0px;
+            background-color: #000000;
+            overflow: hidden;
+        }
+    </style>
+
+</head>
+
+<body>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./assets/js/threejs/three.module.js"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from './assets/js/threejs/addons/controls/OrbitControls.js';
+
+        var camera, scene, renderer;
+        var mesh, controls;
+
+        function addCubes(s) {
+            const initialPoints = [
+                { x: 1, y: 1, z: -1 },
+                { x: 1, y: 0, z: 1 },
+                { x: -1, y: 0, z: 1 },
+                { x: -1, y: 0, z: -1 }
+            ];
+            const cubes = initialPoints.map(pos => {
+                const geometry = new THREE.BoxGeometry();
+                const material = new THREE.MeshBasicMaterial(0xffffff);
+                const cube = new THREE.Mesh(geometry, material);
+                cube.position.copy(pos);
+                s.add(cube);
+                return cube;
+            });
+            return cubes;
+        }
+
+        init();
+        animate();
+
+        function init() {
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+            //
+            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+            camera.position.x = 3;
+            camera.position.y = 5;
+            camera.position.z = 9;
+            scene = new THREE.Scene();
+
+            //添加网格地面
+            const gridHelper = new THREE.GridHelper(10, 10);
+            scene.add(gridHelper);
+
+            /* 1.1 显示坐标轴 */
+            const axesHelper = new THREE.AxesHelper(3);
+            scene.add(axesHelper);
+            // x:红色 ; y;绿色，z: 蓝色
+
+            const cubeList = addCubes(scene);
+
+            // 从一系列的点创建一条平滑的三维样条曲线。
+            const curve = new THREE.CatmullRomCurve3(
+                cubeList.map((cube) => cube.position) // 直接绑定方块的position以便后续用方块调整曲线
+            );
+            curve.curveType = 'chordal'; // 曲线类型
+            curve.closed = true; // 曲线是否闭合
+
+            const points = curve.getPoints(50); // 50等分获取曲线点数组
+            // LineLoop和Line的区别在于，会自动把最后一个点和第一个点连结起来。
+            const line = new THREE.LineLoop(
+                new THREE.BufferGeometry().setFromPoints(points),
+                new THREE.LineBasicMaterial({ color: 0x252A7F })
+            ); // 绘制实体线条，仅用于示意曲线，后面的向量线条同理，相关代码就省略了
+
+            scene.add(line);
+
+
+            /* 添加控制器 */
+            controls = new OrbitControls(camera, renderer.domElement);
+
+            //
+            window.addEventListener('resize', onWindowResize, false);
+
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+    </script>
+</body>
+
+</html>
